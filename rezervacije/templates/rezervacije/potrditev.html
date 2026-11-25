@@ -3,17 +3,26 @@
 {% block naslov %}Rezervacija potrjena{% endblock %}
 
 {% block vsebina %}
-<h1>Rezervacija je uspešna!</h1>
-<p>Hvala, {{ user.first_name|default:user.username }}. Vaš termin je rezerviran.</p>
+<div class="ozka">
+    <div class="kartica uspeh">
+        <div class="kljukica" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="34" height="34"><path d="M5 12.5 10 17.5 19 7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h1>Rezervacija je uspešna!</h1>
+        <p class="podnaslov">Hvala, {{ user.first_name|default:user.username }}. Vaš termin je rezerviran.</p>
 
-<table class="povzetek">
-    <tr><td>Storitev:</td><td>{{ rezervacija.storitev.ime }}</td></tr>
-    <tr><td>Frizer:</td><td>{{ rezervacija.frizer.ime }}</td></tr>
-    <tr><td>Datum:</td><td>{{ rezervacija.datum|date:"d. m. Y" }}</td></tr>
-    <tr><td>Ura:</td><td>{{ rezervacija.ura|time:"H:i" }}</td></tr>
-    <tr><td>Cena:</td><td>{{ rezervacija.storitev.cena }} €</td></tr>
-</table>
+        <dl class="povzetek">
+            <dt>Storitev</dt><dd>{{ rezervacija.storitev.ime }}</dd>
+            <dt>Frizer</dt><dd>{{ rezervacija.frizer.ime }}</dd>
+            <dt>Datum</dt><dd>{{ rezervacija.datum|date:"l, j. n. Y" }}</dd>
+            <dt>Ura</dt><dd>{{ rezervacija.ura|time:"H:i" }}</dd>
+            <dt>Cena</dt><dd class="cena">{{ rezervacija.storitev.cena }} €</dd>
+        </dl>
 
-<a href="{% url 'moje_rezervacije' %}">Moje rezervacije</a>
-<a href="{% url 'domov' %}">Nazaj na začetek</a>
+        <div class="gumbi gumbi-sredina">
+            <a href="{% url 'moje_rezervacije' %}" class="gumb">Moje rezervacije</a>
+            <a href="{% url 'domov' %}" class="gumb gumb-obroba">Nazaj na začetek</a>
+        </div>
+    </div>
+</div>
 {% endblock %}

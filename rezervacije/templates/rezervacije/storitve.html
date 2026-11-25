@@ -3,21 +3,28 @@
 {% block naslov %}Storitve{% endblock %}
 
 {% block vsebina %}
+{% include 'rezervacije/_koraki.html' with korak=1 %}
+
 <h1>Naše storitve</h1>
+<p class="podnaslov">Izberite storitev, za katero želite rezervirati termin.</p>
 
 {% if storitve %}
-<div class="storitve">
+<div class="mreza">
     {% for storitev in storitve %}
-    <div class="kartica">
+    <div class="kartica storitev">
         <h3>{{ storitev.ime }}</h3>
-        <p>{{ storitev.opis }}</p>
-        <p>Trajanje: {{ storitev.trajanje }} min</p>
-        <p><b>{{ storitev.cena }} €</b></p>
-        <a href="{% url 'izbira_termina' storitev.id %}" class="gumb">Izberite termin</a>
+        {% if storitev.opis %}<p class="siva">{{ storitev.opis }}</p>{% endif %}
+        <div class="storitev-podatki">
+            <span class="znacka">{{ storitev.trajanje }} min</span>
+            <span class="cena">{{ storitev.cena }} €</span>
+        </div>
+        <a href="{% url 'izbira_termina' storitev.id %}" class="gumb gumb-poln">Izberite termin</a>
     </div>
     {% endfor %}
 </div>
 {% else %}
-<p>Trenutno ni nobene storitve.</p>
+<div class="prazno">
+    <p>Trenutno ni nobene storitve.</p>
+</div>
 {% endif %}
 {% endblock %}

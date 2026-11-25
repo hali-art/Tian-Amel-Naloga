@@ -3,25 +3,33 @@
 {% block naslov %}Rezervacija{% endblock %}
 
 {% block vsebina %}
-<h1>Potrdite rezervacijo</h1>
+{% include 'rezervacije/_koraki.html' with korak=3 %}
 
-<table class="povzetek">
-    <tr><td>Storitev:</td><td>{{ storitev.ime }}</td></tr>
-    <tr><td>Frizer:</td><td>{{ frizer.ime }}</td></tr>
-    <tr><td>Datum:</td><td>{{ datum|date:"d. m. Y" }}</td></tr>
-    <tr><td>Ura:</td><td>{{ ura|time:"H:i" }}</td></tr>
-    <tr><td>Trajanje:</td><td>{{ storitev.trajanje }} min</td></tr>
-    <tr><td>Cena:</td><td>{{ storitev.cena }} €</td></tr>
-</table>
+<div class="ozka">
+    <div class="kartica">
+        <h1>Potrdite rezervacijo</h1>
+        <p class="podnaslov">Preverite podatke in potrdite termin.</p>
 
-<form method="post">
-    {% csrf_token %}
-    <input type="hidden" name="storitev" value="{{ storitev.id }}">
-    <input type="hidden" name="frizer" value="{{ frizer.id }}">
-    <input type="hidden" name="datum" value="{{ datum|date:'Y-m-d' }}">
-    <input type="hidden" name="ura" value="{{ ura|time:'H:i' }}">
-    <button type="submit">Rezerviraj</button>
-</form>
+        <dl class="povzetek">
+            <dt>Storitev</dt><dd>{{ storitev.ime }}</dd>
+            <dt>Frizer</dt><dd>{{ frizer.ime }}</dd>
+            <dt>Datum</dt><dd>{{ datum|date:"l, j. n. Y" }}</dd>
+            <dt>Ura</dt><dd>{{ ura|time:"H:i" }}</dd>
+            <dt>Trajanje</dt><dd>{{ storitev.trajanje }} min</dd>
+            <dt>Cena</dt><dd class="cena">{{ storitev.cena }} €</dd>
+        </dl>
 
-<a href="{% url 'izbira_termina' storitev.id %}">Nazaj</a>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="storitev" value="{{ storitev.id }}">
+            <input type="hidden" name="frizer" value="{{ frizer.id }}">
+            <input type="hidden" name="datum" value="{{ datum|date:'Y-m-d' }}">
+            <input type="hidden" name="ura" value="{{ ura|time:'H:i' }}">
+            <div class="gumbi">
+                <button type="submit" class="gumb gumb-velik">Rezerviraj</button>
+                <a href="{% url 'izbira_termina' storitev.id %}?frizer={{ frizer.id }}&datum={{ datum|date:'Y-m-d' }}" class="gumb gumb-obroba gumb-velik">Izberi drug termin</a>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}

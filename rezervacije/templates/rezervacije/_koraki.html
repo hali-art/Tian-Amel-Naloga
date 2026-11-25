@@ -1,0 +1,6 @@
+{# prikaz napredka pri rezervaciji: 1 storitev, 2 termin, 3 potrditev #}
+<ol class="napredek">
+    <li class="{% if korak > 1 %}opravljeno{% elif korak == 1 %}trenutno{% endif %}">Storitev</li>
+    <li class="{% if korak > 2 %}opravljeno{% elif korak == 2 %}trenutno{% endif %}">Termin</li>
+    <li class="{% if korak > 3 %}opravljeno{% elif korak == 3 %}trenutno{% endif %}">Potrditev</li>
+</ol>
