@@ -13,6 +13,7 @@
         <p>{{ storitev.opis }}</p>
         <p>Trajanje: {{ storitev.trajanje }} min</p>
         <p><b>{{ storitev.cena }} €</b></p>
+        <a href="{% url 'izbira_termina' storitev.id %}">Izberi termin</a>
     </div>
     {% endfor %}
 </div>

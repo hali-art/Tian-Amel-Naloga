@@ -1,0 +1,45 @@
+{% extends 'rezervacije/base.html' %}
+
+{% block naslov %}Izbira termina{% endblock %}
+
+{% block vsebina %}
+<h1>{{ storitev.ime }}</h1>
+<p>Trajanje: {{ storitev.trajanje }} min | Cena: {{ storitev.cena }} €</p>
+
+<form method="get">
+    <label for="frizer">Frizer:</label>
+    <select name="frizer" id="frizer" required>
+        <option value="">-- izberi frizerja --</option>
+        {% for frizer in frizerji %}
+            <option value="{{ frizer.id }}" {% if izbran_frizer.id == frizer.id %}selected{% endif %}>
+                {{ frizer.ime }} ({{ frizer.zacetek_dela|time:"H:i" }} - {{ frizer.konec_dela|time:"H:i" }})
+            </option>
+        {% endfor %}
+    </select>
+
+    <label for="datum">Datum:</label>
+    <input type="date" name="datum" id="datum" min="{{ danes|date:'Y-m-d' }}"
+           value="{{ izbran_datum|date:'Y-m-d' }}" required>
+
+    <button type="submit">Prikaži proste termine</button>
+</form>
+
+{% if napaka %}
+    <p class="napaka">{{ napaka }}</p>
+{% endif %}
+
+{% if termini is not None %}
+    <h2>Prosti termini za {{ izbran_datum|date:"d. m. Y" }}</h2>
+    {% if termini %}
+        <div class="termini">
+            {% for ura in termini %}
+                <span class="termin">{{ ura|time:"H:i" }}</span>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Na ta dan ni več prostih terminov. Izberite drug dan ali drugega frizerja.</p>
+    {% endif %}
+{% endif %}
+
+<a href="{% url 'storitve' %}">Nazaj na storitve</a>
+{% endblock %}
