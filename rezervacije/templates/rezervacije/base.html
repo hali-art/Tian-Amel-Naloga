@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block naslov %}Frizerski salon{% endblock %}</title>
+</head>
+<body>
+    <nav>
+        <a href="{% url 'domov' %}">Domov</a>
+    </nav>
+
+    <main>
+        {% block vsebina %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>Frizerski salon - rezervacija terminov</p>
+    </footer>
+</body>
+</html>
