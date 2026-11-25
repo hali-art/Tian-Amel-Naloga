@@ -132,6 +132,31 @@ def potrditev(request, rezervacija_id):
     return render(request, 'rezervacije/potrditev.html', {'rezervacija': rezervacija})
 
 
+@login_required(login_url='prijava')
+def moje_rezervacije(request):
+    danes = date.today()
+    rezervacije = Rezervacija.objects.filter(uporabnik=request.user).order_by('datum', 'ura')
+    prihajajoce = rezervacije.filter(datum__gte=danes, status='potrjena')
+    pretekle = rezervacije.exclude(id__in=prihajajoce).order_by('-datum', '-ura')
+    return render(request, 'rezervacije/moje_rezervacije.html', {
+        'prihajajoce': prihajajoce,
+        'pretekle': pretekle,
+    })
+
+
+@login_required(login_url='prijava')
+def preklici_rezervacijo(request, rezervacija_id):
+    rezervacija = get_object_or_404(Rezervacija, id=rezervacija_id, uporabnik=request.user)
+    if request.method == 'POST':
+        if rezervacija.datum < date.today():
+            messages.error(request, 'Pretekle rezervacije ni mogoče preklicati.')
+        else:
+            rezervacija.status = 'preklicana'
+            rezervacija.save()
+            messages.success(request, 'Rezervacija je preklicana.')
+    return redirect('moje_rezervacije')
+
+
 def registracija(request):
     if request.method == 'POST':
         form = RegistracijaForm(request.POST)

@@ -1,0 +1,51 @@
+{% extends 'rezervacije/base.html' %}
+
+{% block naslov %}Moje rezervacije{% endblock %}
+
+{% block vsebina %}
+<h1>Moje rezervacije</h1>
+
+<h2>Prihajajoče</h2>
+{% if prihajajoce %}
+<table>
+    <tr>
+        <th>Datum</th><th>Ura</th><th>Storitev</th><th>Frizer</th><th></th>
+    </tr>
+    {% for r in prihajajoce %}
+    <tr>
+        <td>{{ r.datum|date:"d. m. Y" }}</td>
+        <td>{{ r.ura|time:"H:i" }}</td>
+        <td>{{ r.storitev.ime }}</td>
+        <td>{{ r.frizer.ime }}</td>
+        <td>
+            <form action="{% url 'preklici_rezervacijo' r.id %}" method="post"
+                  onsubmit="return confirm('Ali res želite preklicati rezervacijo?');">
+                {% csrf_token %}
+                <button type="submit" class="gumb-preklic">Prekliči</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>Nimate prihajajočih rezervacij. <a href="{% url 'storitve' %}">Rezervirajte termin</a></p>
+{% endif %}
+
+{% if pretekle %}
+<h2>Pretekle in preklicane</h2>
+<table>
+    <tr>
+        <th>Datum</th><th>Ura</th><th>Storitev</th><th>Frizer</th><th>Status</th>
+    </tr>
+    {% for r in pretekle %}
+    <tr>
+        <td>{{ r.datum|date:"d. m. Y" }}</td>
+        <td>{{ r.ura|time:"H:i" }}</td>
+        <td>{{ r.storitev.ime }}</td>
+        <td>{{ r.frizer.ime }}</td>
+        <td>{{ r.get_status_display }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+{% endblock %}
