@@ -3,30 +3,31 @@
 {% block naslov %}Pregled terminov{% endblock %}
 
 {% block vsebina %}
-<h1>Termini za {{ frizer.ime }}</h1>
+<h1>Termini – {{ frizer.ime }}</h1>
+<p class="podnaslov">Delovni čas: {{ frizer.zacetek_dela|time:"H:i" }} – {{ frizer.konec_dela|time:"H:i" }}</p>
 
-<div class="dnevi">
-    <a href="?datum={{ prejsnji|date:'Y-m-d' }}">&laquo; Prejšnji dan</a>
-    <b>{{ datum|date:"l, d. m. Y" }}</b>
-    <a href="?datum={{ naslednji|date:'Y-m-d' }}">Naslednji dan &raquo;</a>
+<div class="dnevi kartica">
+    <a href="?datum={{ prejsnji|date:'Y-m-d' }}" class="gumb gumb-obroba gumb-mali">&larr; Prejšnji dan</a>
+    <b>{{ datum|date:"l, j. n. Y" }}</b>
+    <a href="?datum={{ naslednji|date:'Y-m-d' }}" class="gumb gumb-obroba gumb-mali">Naslednji dan &rarr;</a>
 </div>
 
 {% if rezervacije %}
-<table>
-    <tr>
-        <th>Ura</th><th>Stranka</th><th>Storitev</th><th>Trajanje</th>
-    </tr>
+<div class="urnik">
     {% for r in rezervacije %}
-    <tr>
-        <td>{{ r.ura|time:"H:i" }}</td>
-        <td>{{ r.uporabnik.get_full_name|default:r.uporabnik.username }}</td>
-        <td>{{ r.storitev.ime }}</td>
-        <td>{{ r.storitev.trajanje }} min</td>
-    </tr>
+    <div class="urnik-vrstica">
+        <span class="urnik-ura">{{ r.ura|time:"H:i" }}</span>
+        <div class="kartica urnik-termin">
+            <b>{{ r.uporabnik.get_full_name|default:r.uporabnik.username }}</b>
+            <p class="siva">{{ r.storitev.ime }} · {{ r.storitev.trajanje }} min</p>
+        </div>
+    </div>
     {% endfor %}
-</table>
-<p>Število rezervacij: {{ rezervacije|length }}</p>
+</div>
+<p class="siva">Število rezervacij: {{ rezervacije|length }}</p>
 {% else %}
-<p>Za ta dan ni rezervacij.</p>
+<div class="prazno">
+    <p>Za ta dan ni rezervacij.</p>
+</div>
 {% endif %}
 {% endblock %}

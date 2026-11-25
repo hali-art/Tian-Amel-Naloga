@@ -3,49 +3,64 @@
 {% block naslov %}Moje rezervacije{% endblock %}
 
 {% block vsebina %}
-<h1>Moje rezervacije</h1>
+<div class="naslov-vrstica">
+    <h1>Moje rezervacije</h1>
+    <a href="{% url 'storitve' %}" class="gumb">+ Nova rezervacija</a>
+</div>
 
 <h2>Prihajajoče</h2>
 {% if prihajajoce %}
-<table>
-    <tr>
-        <th>Datum</th><th>Ura</th><th>Storitev</th><th>Frizer</th><th></th>
-    </tr>
+<div class="seznam">
     {% for r in prihajajoce %}
-    <tr>
-        <td>{{ r.datum|date:"d. m. Y" }}</td>
-        <td>{{ r.ura|time:"H:i" }}</td>
-        <td>{{ r.storitev.ime }}</td>
-        <td>{{ r.frizer.ime }}</td>
-        <td>
-            <form action="{% url 'preklici_rezervacijo' r.id %}" method="post"
-                  onsubmit="return confirm('Ali res želite preklicati rezervacijo?');">
-                {% csrf_token %}
-                <button type="submit" class="gumb-preklic">Prekliči</button>
-            </form>
-        </td>
-    </tr>
+    <div class="kartica rezervacija">
+        <div class="datum-blok">
+            <span class="dan">{{ r.datum|date:"j" }}</span>
+            <span class="mesec">{{ r.datum|date:"M" }}</span>
+        </div>
+        <div class="rezervacija-podatki">
+            <b>{{ r.storitev.ime }}</b>
+            <p class="siva">{{ r.datum|date:"l" }} ob {{ r.ura|time:"H:i" }} · frizer {{ r.frizer.ime }}</p>
+        </div>
+        <form action="{% url 'preklici_rezervacijo' r.id %}" method="post"
+              onsubmit="return confirm('Ali res želite preklicati rezervacijo?');">
+            {% csrf_token %}
+            <button type="submit" class="gumb gumb-preklic gumb-mali">Prekliči</button>
+        </form>
+    </div>
     {% endfor %}
-</table>
+</div>
 {% else %}
-<p>Nimate prihajajočih rezervacij. <a href="{% url 'storitve' %}">Rezervirajte termin</a></p>
+<div class="prazno">
+    <p>Nimate prihajajočih rezervacij.</p>
+    <a href="{% url 'storitve' %}" class="gumb">Rezervirajte termin</a>
+</div>
 {% endif %}
 
 {% if pretekle %}
 <h2>Pretekle in preklicane</h2>
+<div class="tabela-okvir">
 <table>
-    <tr>
-        <th>Datum</th><th>Ura</th><th>Storitev</th><th>Frizer</th><th>Status</th>
-    </tr>
+    <thead>
+        <tr><th>Datum</th><th>Ura</th><th>Storitev</th><th>Frizer</th><th>Status</th></tr>
+    </thead>
+    <tbody>
     {% for r in pretekle %}
-    <tr>
-        <td>{{ r.datum|date:"d. m. Y" }}</td>
-        <td>{{ r.ura|time:"H:i" }}</td>
-        <td>{{ r.storitev.ime }}</td>
-        <td>{{ r.frizer.ime }}</td>
-        <td>{{ r.get_status_display }}</td>
-    </tr>
+        <tr>
+            <td>{{ r.datum|date:"d. m. Y" }}</td>
+            <td>{{ r.ura|time:"H:i" }}</td>
+            <td>{{ r.storitev.ime }}</td>
+            <td>{{ r.frizer.ime }}</td>
+            <td>
+                {% if r.status == 'preklicana' %}
+                    <span class="znacka znacka-rdeca">Preklicana</span>
+                {% else %}
+                    <span class="znacka znacka-siva">Opravljena</span>
+                {% endif %}
+            </td>
+        </tr>
     {% endfor %}
+    </tbody>
 </table>
+</div>
 {% endif %}
 {% endblock %}
