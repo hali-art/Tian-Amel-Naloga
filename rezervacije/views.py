@@ -2,6 +2,7 @@ from datetime import datetime, timedelta, date
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 
@@ -87,6 +88,48 @@ def izbira_termina(request, storitev_id):
         'napaka': napaka,
         'danes': date.today(),
     })
+
+
+@login_required(login_url='prijava')
+def rezerviraj(request):
+    # podatki pridejo iz izbire termina (GET) oz. iz obrazca (POST)
+    podatki = request.POST if request.method == 'POST' else request.GET
+    try:
+        storitev = Storitev.objects.get(id=podatki.get('storitev'))
+        frizer = Frizer.objects.get(id=podatki.get('frizer'))
+        datum = datetime.strptime(podatki.get('datum'), '%Y-%m-%d').date()
+        ura = datetime.strptime(podatki.get('ura'), '%H:%M').time()
+    except (Storitev.DoesNotExist, Frizer.DoesNotExist, ValueError, TypeError):
+        messages.error(request, 'Napačni podatki za rezervacijo.')
+        return redirect('storitve')
+
+    if request.method == 'POST':
+        # se enkrat preverimo ce je termin res se prost (da ga ni kdo vmes zasedel)
+        if ura not in prosti_termini(frizer, storitev, datum):
+            messages.error(request, 'Ta termin je žal že zaseden. Izberite drugega.')
+            return redirect('izbira_termina', storitev_id=storitev.id)
+
+        rezervacija = Rezervacija.objects.create(
+            uporabnik=request.user,
+            frizer=frizer,
+            storitev=storitev,
+            datum=datum,
+            ura=ura,
+        )
+        return redirect('potrditev', rezervacija_id=rezervacija.id)
+
+    return render(request, 'rezervacije/rezerviraj.html', {
+        'storitev': storitev,
+        'frizer': frizer,
+        'datum': datum,
+        'ura': ura,
+    })
+
+
+@login_required(login_url='prijava')
+def potrditev(request, rezervacija_id):
+    rezervacija = get_object_or_404(Rezervacija, id=rezervacija_id, uporabnik=request.user)
+    return render(request, 'rezervacije/potrditev.html', {'rezervacija': rezervacija})
 
 
 def registracija(request):

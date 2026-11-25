@@ -33,7 +33,7 @@
     {% if termini %}
         <div class="termini">
             {% for ura in termini %}
-                <span class="termin">{{ ura|time:"H:i" }}</span>
+                <a class="termin" href="{% url 'rezerviraj' %}?storitev={{ storitev.id }}&frizer={{ izbran_frizer.id }}&datum={{ izbran_datum|date:'Y-m-d' }}&ura={{ ura|time:'H:i' }}">{{ ura|time:"H:i" }}</a>
             {% endfor %}
         </div>
     {% else %}

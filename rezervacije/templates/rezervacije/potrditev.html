@@ -1,0 +1,18 @@
+{% extends 'rezervacije/base.html' %}
+
+{% block naslov %}Rezervacija potrjena{% endblock %}
+
+{% block vsebina %}
+<h1>Rezervacija je uspešna!</h1>
+<p>Hvala, {{ user.first_name|default:user.username }}. Vaš termin je rezerviran.</p>
+
+<table class="povzetek">
+    <tr><td>Storitev:</td><td>{{ rezervacija.storitev.ime }}</td></tr>
+    <tr><td>Frizer:</td><td>{{ rezervacija.frizer.ime }}</td></tr>
+    <tr><td>Datum:</td><td>{{ rezervacija.datum|date:"d. m. Y" }}</td></tr>
+    <tr><td>Ura:</td><td>{{ rezervacija.ura|time:"H:i" }}</td></tr>
+    <tr><td>Cena:</td><td>{{ rezervacija.storitev.cena }} €</td></tr>
+</table>
+
+<a href="{% url 'domov' %}">Nazaj na začetek</a>
+{% endblock %}

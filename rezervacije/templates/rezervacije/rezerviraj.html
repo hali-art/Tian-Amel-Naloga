@@ -1,0 +1,27 @@
+{% extends 'rezervacije/base.html' %}
+
+{% block naslov %}Rezervacija{% endblock %}
+
+{% block vsebina %}
+<h1>Potrdite rezervacijo</h1>
+
+<table class="povzetek">
+    <tr><td>Storitev:</td><td>{{ storitev.ime }}</td></tr>
+    <tr><td>Frizer:</td><td>{{ frizer.ime }}</td></tr>
+    <tr><td>Datum:</td><td>{{ datum|date:"d. m. Y" }}</td></tr>
+    <tr><td>Ura:</td><td>{{ ura|time:"H:i" }}</td></tr>
+    <tr><td>Trajanje:</td><td>{{ storitev.trajanje }} min</td></tr>
+    <tr><td>Cena:</td><td>{{ storitev.cena }} €</td></tr>
+</table>
+
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="storitev" value="{{ storitev.id }}">
+    <input type="hidden" name="frizer" value="{{ frizer.id }}">
+    <input type="hidden" name="datum" value="{{ datum|date:'Y-m-d' }}">
+    <input type="hidden" name="ura" value="{{ ura|time:'H:i' }}">
+    <button type="submit">Rezerviraj</button>
+</form>
+
+<a href="{% url 'izbira_termina' storitev.id %}">Nazaj</a>
+{% endblock %}
