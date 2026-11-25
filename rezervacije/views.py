@@ -1,20 +1,26 @@
 from datetime import datetime, timedelta
 
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 
-from .forms import RegistracijaForm
+from .forms import RegistracijaForm, PrijavaForm
 from .models import Storitev, Frizer, Rezervacija
 
 
 def domov(request):
-    return render(request, 'rezervacije/domov.html')
+    # na domači strani pokažemo nekaj storitev in frizerje
+    storitve = Storitev.objects.all().order_by('cena')[:3]
+    frizerji = Frizer.objects.all().order_by('ime')
+    return render(request, 'rezervacije/domov.html', {
+        'storitve': storitve,
+        'frizerji': frizerji,
+    })
 
 
 def seznam_storitev(request):
@@ -122,7 +128,9 @@ def rezerviraj(request):
         # še enkrat preverimo, ali je termin res še prost (da ga ni kdo vmes zasedel)
         if ura not in prosti_termini(frizer, storitev, datum):
             messages.error(request, 'Ta termin je žal že zaseden. Izberite drugega.')
-            return redirect('izbira_termina', storitev_id=storitev.id)
+            # vrnemo ga na isti dan in istega frizerja, da mu ni treba vsega izbirati znova
+            url = reverse('izbira_termina', args=[storitev.id])
+            return redirect(f'{url}?frizer={frizer.id}&datum={datum:%Y-%m-%d}')
 
         rezervacija = Rezervacija.objects.create(
             uporabnik=request.user,
@@ -207,6 +215,9 @@ def pregled_frizer(request):
 
 
 def registracija(request):
+    if request.user.is_authenticated:
+        return redirect('domov')
+
     if request.method == 'POST':
         form = RegistracijaForm(request.POST)
         if form.is_valid():
@@ -220,10 +231,15 @@ def registracija(request):
 
 
 def prijava(request):
+    if request.user.is_authenticated:
+        return redirect('domov')
+
     if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
+        form = PrijavaForm(request, data=request.POST)
         if form.is_valid():
-            login(request, form.get_user())
+            uporabnik = form.get_user()
+            login(request, uporabnik)
+            messages.success(request, f'Pozdravljeni, {uporabnik.first_name or uporabnik.username}!')
             # če je prišel s strani, ki zahteva prijavo, ga vrnemo nazaj
             # (samo na naš strežnik, ne na kakšno tujo stran)
             naslednja = request.GET.get('next')
@@ -231,7 +247,7 @@ def prijava(request):
                 return redirect(naslednja)
             return redirect('domov')
     else:
-        form = AuthenticationForm()
+        form = PrijavaForm()
     return render(request, 'rezervacije/prijava.html', {'form': form})
 
 
