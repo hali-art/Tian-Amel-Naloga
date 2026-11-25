@@ -1,0 +1,13 @@
+{% extends 'rezervacije/base.html' %}
+
+{% block naslov %}Prijava{% endblock %}
+
+{% block vsebina %}
+<h1>Prijava</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Prijava</button>
+</form>
+<p>Še nimate računa? <a href="{% url 'registracija' %}">Registrirajte se</a></p>
+{% endblock %}

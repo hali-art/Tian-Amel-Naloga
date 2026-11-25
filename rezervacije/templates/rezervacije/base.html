@@ -7,7 +7,23 @@
 <body>
     <nav>
         <a href="{% url 'domov' %}">Domov</a>
+        {% if user.is_authenticated %}
+            <span>Pozdravljen, {{ user.username }}</span>
+            <form action="{% url 'odjava' %}" method="post" style="display:inline">
+                {% csrf_token %}
+                <button type="submit">Odjava</button>
+            </form>
+        {% else %}
+            <a href="{% url 'prijava' %}">Prijava</a>
+            <a href="{% url 'registracija' %}">Registracija</a>
+        {% endif %}
     </nav>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="sporocilo {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
 
     <main>
         {% block vsebina %}{% endblock %}
