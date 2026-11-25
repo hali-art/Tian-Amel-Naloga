@@ -9,6 +9,7 @@ urlpatterns = [
     path('rezervacija/<int:rezervacija_id>/potrditev/', views.potrditev, name='potrditev'),
     path('moje-rezervacije/', views.moje_rezervacije, name='moje_rezervacije'),
     path('rezervacija/<int:rezervacija_id>/preklici/', views.preklici_rezervacijo, name='preklici_rezervacijo'),
+    path('frizer/', views.pregled_frizer, name='pregled_frizer'),
     path('registracija/', views.registracija, name='registracija'),
     path('prijava/', views.prijava, name='prijava'),
     path('odjava/', views.odjava, name='odjava'),

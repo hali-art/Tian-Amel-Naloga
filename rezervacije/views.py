@@ -157,6 +157,35 @@ def preklici_rezervacijo(request, rezervacija_id):
     return redirect('moje_rezervacije')
 
 
+@login_required(login_url='prijava')
+def pregled_frizer(request):
+    # do strani lahko pride samo frizer (uporabnik ki je povezan s frizerjem)
+    frizer = Frizer.objects.filter(uporabnik=request.user).first()
+    if frizer is None:
+        messages.error(request, 'Do te strani imajo dostop samo frizerji.')
+        return redirect('domov')
+
+    datum = date.today()
+    datum_str = request.GET.get('datum')
+    if datum_str:
+        try:
+            datum = datetime.strptime(datum_str, '%Y-%m-%d').date()
+        except ValueError:
+            pass
+
+    rezervacije = Rezervacija.objects.filter(
+        frizer=frizer, datum=datum, status='potrjena'
+    ).order_by('ura')
+
+    return render(request, 'rezervacije/pregled_frizer.html', {
+        'frizer': frizer,
+        'datum': datum,
+        'prejsnji': datum - timedelta(days=1),
+        'naslednji': datum + timedelta(days=1),
+        'rezervacije': rezervacije,
+    })
+
+
 def registracija(request):
     if request.method == 'POST':
         form = RegistracijaForm(request.POST)

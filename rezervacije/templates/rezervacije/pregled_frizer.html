@@ -1,0 +1,32 @@
+{% extends 'rezervacije/base.html' %}
+
+{% block naslov %}Pregled terminov{% endblock %}
+
+{% block vsebina %}
+<h1>Termini za {{ frizer.ime }}</h1>
+
+<div class="dnevi">
+    <a href="?datum={{ prejsnji|date:'Y-m-d' }}">&laquo; Prejšnji dan</a>
+    <b>{{ datum|date:"l, d. m. Y" }}</b>
+    <a href="?datum={{ naslednji|date:'Y-m-d' }}">Naslednji dan &raquo;</a>
+</div>
+
+{% if rezervacije %}
+<table>
+    <tr>
+        <th>Ura</th><th>Stranka</th><th>Storitev</th><th>Trajanje</th>
+    </tr>
+    {% for r in rezervacije %}
+    <tr>
+        <td>{{ r.ura|time:"H:i" }}</td>
+        <td>{{ r.uporabnik.get_full_name|default:r.uporabnik.username }}</td>
+        <td>{{ r.storitev.ime }}</td>
+        <td>{{ r.storitev.trajanje }} min</td>
+    </tr>
+    {% endfor %}
+</table>
+<p>Skupaj: {{ rezervacije|length }} rezervacij</p>
+{% else %}
+<p>Za ta dan ni rezervacij.</p>
+{% endif %}
+{% endblock %}
