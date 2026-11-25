@@ -1,11 +1,15 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="sl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'rezervacije/style.css' %}">
     <title>{% block naslov %}Frizerski salon{% endblock %}</title>
 </head>
 <body>
     <nav>
+        <a href="{% url 'domov' %}" class="logo">✂ Salon</a>
         <a href="{% url 'domov' %}">Domov</a>
         <a href="{% url 'storitve' %}">Storitve</a>
         {% if user.is_authenticated %}
@@ -13,10 +17,10 @@
             {% if user.frizer %}
                 <a href="{% url 'pregled_frizer' %}">Moji termini</a>
             {% endif %}
-            <span>Pozdravljen, {{ user.username }}</span>
+            <span class="pozdrav">Pozdravljen, {{ user.username }}</span>
             <form action="{% url 'odjava' %}" method="post" style="display:inline">
                 {% csrf_token %}
-                <button type="submit">Odjava</button>
+                <button type="submit" class="gumb-odjava">Odjava</button>
             </form>
         {% else %}
             <a href="{% url 'prijava' %}">Prijava</a>

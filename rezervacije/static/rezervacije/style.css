@@ -1,0 +1,251 @@
+/* osnovni stil za aplikacijo frizerski salon */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #f7f3ef;
+    color: #333;
+}
+
+nav {
+    background-color: #3b2f2f;
+    padding: 12px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 15px;
+}
+
+nav a {
+    color: #fff;
+    text-decoration: none;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+nav .logo {
+    font-weight: bold;
+    font-size: 20px;
+    margin-right: auto;
+}
+
+nav .pozdrav {
+    color: #d8c3a5;
+}
+
+nav form {
+    margin: 0;
+}
+
+main {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+h1 {
+    color: #3b2f2f;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    color: #888;
+    font-size: 14px;
+}
+
+/* gumbi */
+button, .gumb {
+    display: inline-block;
+    background-color: #a0785a;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 15px;
+}
+
+button:hover, .gumb:hover {
+    background-color: #85604a;
+}
+
+.gumb-odjava {
+    background-color: transparent;
+    border: 1px solid #fff;
+    padding: 5px 12px;
+}
+
+.gumb-preklic {
+    background-color: #c0392b;
+    padding: 6px 12px;
+}
+
+.gumb-preklic:hover {
+    background-color: #962d22;
+}
+
+/* sporocila */
+.sporocilo {
+    max-width: 900px;
+    margin: 15px auto 0;
+    padding: 10px 15px;
+    border-radius: 5px;
+    background-color: #e3f1e3;
+    border: 1px solid #9fcf9f;
+}
+
+.sporocilo.error {
+    background-color: #f8e0e0;
+    border-color: #e09a9a;
+}
+
+.napaka {
+    color: #c0392b;
+}
+
+/* domov */
+.uvod {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+/* storitve */
+.storitve {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.kartica {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.kartica h3 {
+    margin-top: 0;
+}
+
+/* obrazci */
+form p {
+    margin: 10px 0;
+}
+
+input, select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 15px;
+}
+
+form label {
+    display: inline-block;
+    margin: 5px 5px 5px 0;
+}
+
+.helptext, .helptext ul {
+    font-size: 12px;
+    color: #777;
+}
+
+/* termini */
+.termini {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 15px 0 25px;
+}
+
+.termin {
+    background-color: white;
+    border: 2px solid #a0785a;
+    color: #a0785a;
+    padding: 8px 14px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.termin:hover {
+    background-color: #a0785a;
+    color: white;
+}
+
+/* tabele */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    margin-bottom: 20px;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+th {
+    background-color: #d8c3a5;
+}
+
+td form {
+    margin: 0;
+}
+
+.povzetek {
+    max-width: 400px;
+}
+
+.dnevi {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+/* telefon */
+@media (max-width: 600px) {
+    nav {
+        justify-content: center;
+    }
+
+    nav .logo {
+        width: 100%;
+        text-align: center;
+        margin-right: 0;
+    }
+
+    main {
+        margin: 15px auto;
+    }
+
+    .uvod {
+        padding: 20px;
+    }
+
+    form select, form input {
+        width: 100%;
+    }
+
+    th, td {
+        padding: 6px;
+        font-size: 14px;
+    }
+
+    .dnevi {
+        flex-direction: column;
+        gap: 8px;
+    }
+}
