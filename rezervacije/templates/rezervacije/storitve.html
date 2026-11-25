@@ -1,0 +1,22 @@
+{% extends 'rezervacije/base.html' %}
+
+{% block naslov %}Storitve{% endblock %}
+
+{% block vsebina %}
+<h1>Naše storitve</h1>
+
+{% if storitve %}
+<div class="storitve">
+    {% for storitev in storitve %}
+    <div class="kartica">
+        <h3>{{ storitev.ime }}</h3>
+        <p>{{ storitev.opis }}</p>
+        <p>Trajanje: {{ storitev.trajanje }} min</p>
+        <p><b>{{ storitev.cena }} €</b></p>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>Trenutno ni nobene storitve.</p>
+{% endif %}
+{% endblock %}

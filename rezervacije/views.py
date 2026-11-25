@@ -4,10 +4,16 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 
 from .forms import RegistracijaForm
+from .models import Storitev
 
 
 def domov(request):
     return render(request, 'rezervacije/domov.html')
+
+
+def seznam_storitev(request):
+    storitve = Storitev.objects.all().order_by('ime')
+    return render(request, 'rezervacije/storitve.html', {'storitve': storitve})
 
 
 def registracija(request):
