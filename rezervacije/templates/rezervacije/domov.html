@@ -1,10 +1,83 @@
 {% extends 'rezervacije/base.html' %}
 
+{% block main_razred %}{% endblock %}
+
 {% block vsebina %}
-<div class="uvod">
-<h1>Dobrodošli v našem frizerskem salonu</h1>
-<p>Tukaj si lahko enostavno rezervirate termin pri frizerju.
-Izberite storitev, frizerja in termin, ki vam ustreza.</p>
-<a href="{% url 'storitve' %}" class="gumb">Oglejte si storitve</a>
-</div>
+<section class="uvod">
+    <div class="uvod-vsebina">
+        <div class="uvod-besedilo">
+            <h1>Nova pričeska je le nekaj klikov stran</h1>
+            <p>Izberite storitev, frizerja in termin, ki vam ustreza. Brez klicanja in čakanja na telefonu.</p>
+            <div class="gumbi">
+                <a href="{% url 'storitve' %}" class="gumb gumb-velik">Rezerviraj termin</a>
+                {% if not user.is_authenticated %}
+                    <a href="{% url 'registracija' %}" class="gumb gumb-obroba gumb-velik">Ustvari račun</a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="uvod-slika" aria-hidden="true">
+            <svg viewBox="0 0 200 200">
+                <circle cx="100" cy="100" r="92" class="krog"/>
+                <g class="skarje">
+                    <circle cx="62" cy="62" r="20"/>
+                    <circle cx="62" cy="138" r="20"/>
+                    <path d="M76 76 160 160M76 124 160 40"/>
+                </g>
+                <circle cx="118" cy="100" r="5" class="vijak"/>
+            </svg>
+        </div>
+    </div>
+</section>
+
+<section class="vsebina">
+    <h2 class="naslov-sekcije">Kako deluje?</h2>
+    <div class="koraki-domov">
+        <div class="korak-kartica">
+            <span class="stevilka">1</span>
+            <h3>Izberite storitev</h3>
+            <p>Striženje, barvanje, urejanje brade ... Pri vsaki storitvi vidite ceno in trajanje.</p>
+        </div>
+        <div class="korak-kartica">
+            <span class="stevilka">2</span>
+            <h3>Izberite termin</h3>
+            <p>Izberete frizerja in dan, prikažejo se samo prosti termini.</p>
+        </div>
+        <div class="korak-kartica">
+            <span class="stevilka">3</span>
+            <h3>Potrdite rezervacijo</h3>
+            <p>Termin je vaš. Če vam ne ustreza več, ga lahko kadarkoli prekličete.</p>
+        </div>
+    </div>
+
+    {% if storitve %}
+    <div class="naslov-vrstica">
+        <h2 class="naslov-sekcije">Iz naše ponudbe</h2>
+        <a href="{% url 'storitve' %}">Vse storitve &rarr;</a>
+    </div>
+    <div class="mreza">
+        {% for storitev in storitve %}
+        <a href="{% url 'izbira_termina' storitev.id %}" class="kartica kartica-povezava">
+            <h3>{{ storitev.ime }}</h3>
+            <p class="siva">{{ storitev.trajanje }} min</p>
+            <p class="cena">{{ storitev.cena }} €</p>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if frizerji %}
+    <h2 class="naslov-sekcije">Naši frizerji</h2>
+    <div class="frizerji">
+        {% for frizer in frizerji %}
+        <div class="frizer">
+            <span class="avatar">{{ frizer.ime|first }}</span>
+            <div>
+                <b>{{ frizer.ime }}</b>
+                <p class="siva">{{ frizer.zacetek_dela|time:"H:i" }} – {{ frizer.konec_dela|time:"H:i" }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</section>
 {% endblock %}
