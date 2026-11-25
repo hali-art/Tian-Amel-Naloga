@@ -92,7 +92,7 @@ button:hover, .gumb:hover {
     background-color: #962d22;
 }
 
-/* sporocila */
+/* sporočila */
 .sporocilo {
     max-width: 900px;
     margin: 15px auto 0;
@@ -215,7 +215,7 @@ td form {
     margin-bottom: 15px;
 }
 
-/* telefon */
+/* manjši zasloni (telefon) */
 @media (max-width: 600px) {
     nav {
         justify-content: center;

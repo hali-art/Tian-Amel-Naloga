@@ -1,10 +1,13 @@
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
+from django.db.models import Q
+from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from .forms import RegistracijaForm
 from .models import Storitev, Frizer, Rezervacija
@@ -19,15 +22,27 @@ def seznam_storitev(request):
     return render(request, 'rezervacije/storitve.html', {'storitve': storitve})
 
 
+def preveri_datum(datum):
+    """Vrne napako, če datuma ni mogoče izbrati, sicer None."""
+    if datum < timezone.localdate():
+        return 'Ne morete izbrati datuma v preteklosti.'
+    if datum.weekday() == 6:
+        return 'Ob nedeljah je salon zaprt.'
+    return None
+
+
 def prosti_termini(frizer, storitev, datum):
-    """Vrne seznam ur (time) ko je frizer prost za izbrano storitev."""
+    """Vrne seznam ur (time), ko je frizer prost za izbrano storitev."""
+    if preveri_datum(datum):
+        return []
+
     korak = timedelta(minutes=30)
     trajanje = timedelta(minutes=storitev.trajanje)
 
     zacetek = datetime.combine(datum, frizer.zacetek_dela)
     konec = datetime.combine(datum, frizer.konec_dela)
 
-    # ze zasedeni termini tega frizerja na ta dan
+    # že zasedeni termini tega frizerja na ta dan
     zasedeni = []
     rezervacije = Rezervacija.objects.filter(frizer=frizer, datum=datum, status='potrjena')
     for r in rezervacije:
@@ -36,7 +51,8 @@ def prosti_termini(frizer, storitev, datum):
 
     termini = []
     cas = zacetek
-    zdaj = datetime.now()
+    # lokalni čas (Ljubljana), brez časovnega pasu, da ga lahko primerjamo
+    zdaj = timezone.localtime().replace(tzinfo=None)
     while cas + trajanje <= konec:
         prost = True
         for z, k in zasedeni:
@@ -54,7 +70,7 @@ def prosti_termini(frizer, storitev, datum):
 
 def izbira_termina(request, storitev_id):
     storitev = get_object_or_404(Storitev, id=storitev_id)
-    frizerji = Frizer.objects.all()
+    frizerji = Frizer.objects.all().order_by('ime')
 
     izbran_frizer = None
     izbran_datum = None
@@ -65,18 +81,17 @@ def izbira_termina(request, storitev_id):
     datum_str = request.GET.get('datum')
 
     if frizer_id and datum_str:
-        izbran_frizer = get_object_or_404(Frizer, id=frizer_id)
+        izbran_frizer = frizerji.filter(id=frizer_id).first() if frizer_id.isdigit() else None
         try:
             izbran_datum = datetime.strptime(datum_str, '%Y-%m-%d').date()
         except ValueError:
             napaka = 'Datum ni pravilen.'
 
-        if izbran_datum:
-            if izbran_datum < date.today():
-                napaka = 'Ne morete izbrati datuma v preteklosti.'
-            elif izbran_datum.weekday() == 6:
-                napaka = 'Ob nedeljah je salon zaprt.'
-            else:
+        if izbran_frizer is None:
+            napaka = 'Izbrani frizer ne obstaja.'
+        elif izbran_datum:
+            napaka = preveri_datum(izbran_datum)
+            if napaka is None:
                 termini = prosti_termini(izbran_frizer, storitev, izbran_datum)
 
     return render(request, 'rezervacije/izbira_termina.html', {
@@ -86,7 +101,7 @@ def izbira_termina(request, storitev_id):
         'izbran_datum': izbran_datum,
         'termini': termini,
         'napaka': napaka,
-        'danes': date.today(),
+        'danes': timezone.localdate(),
     })
 
 
@@ -104,7 +119,7 @@ def rezerviraj(request):
         return redirect('storitve')
 
     if request.method == 'POST':
-        # se enkrat preverimo ce je termin res se prost (da ga ni kdo vmes zasedel)
+        # še enkrat preverimo, ali je termin res še prost (da ga ni kdo vmes zasedel)
         if ura not in prosti_termini(frizer, storitev, datum):
             messages.error(request, 'Ta termin je žal že zaseden. Izberite drugega.')
             return redirect('izbira_termina', storitev_id=storitev.id)
@@ -134,9 +149,11 @@ def potrditev(request, rezervacija_id):
 
 @login_required(login_url='prijava')
 def moje_rezervacije(request):
-    danes = date.today()
-    rezervacije = Rezervacija.objects.filter(uporabnik=request.user).order_by('datum', 'ura')
-    prihajajoce = rezervacije.filter(datum__gte=danes, status='potrjena')
+    zdaj = timezone.localtime()
+    rezervacije = Rezervacija.objects.filter(uporabnik=request.user)
+    # prihajajoče so tiste od jutri naprej in današnje, ki se še niso začele
+    se_niso_bile = Q(datum__gt=zdaj.date()) | Q(datum=zdaj.date(), ura__gt=zdaj.time())
+    prihajajoce = rezervacije.filter(se_niso_bile, status='potrjena').order_by('datum', 'ura')
     pretekle = rezervacije.exclude(id__in=prihajajoce).order_by('-datum', '-ura')
     return render(request, 'rezervacije/moje_rezervacije.html', {
         'prihajajoce': prihajajoce,
@@ -148,8 +165,11 @@ def moje_rezervacije(request):
 def preklici_rezervacijo(request, rezervacija_id):
     rezervacija = get_object_or_404(Rezervacija, id=rezervacija_id, uporabnik=request.user)
     if request.method == 'POST':
-        if rezervacija.datum < date.today():
+        zdaj = timezone.localtime().replace(tzinfo=None)
+        if datetime.combine(rezervacija.datum, rezervacija.ura) <= zdaj:
             messages.error(request, 'Pretekle rezervacije ni mogoče preklicati.')
+        elif rezervacija.status == 'preklicana':
+            messages.info(request, 'Ta rezervacija je že preklicana.')
         else:
             rezervacija.status = 'preklicana'
             rezervacija.save()
@@ -159,13 +179,13 @@ def preklici_rezervacijo(request, rezervacija_id):
 
 @login_required(login_url='prijava')
 def pregled_frizer(request):
-    # do strani lahko pride samo frizer (uporabnik ki je povezan s frizerjem)
+    # do strani lahko pride samo frizer (uporabnik, ki je povezan s frizerjem)
     frizer = Frizer.objects.filter(uporabnik=request.user).first()
     if frizer is None:
         messages.error(request, 'Do te strani imajo dostop samo frizerji.')
         return redirect('domov')
 
-    datum = date.today()
+    datum = timezone.localdate()
     datum_str = request.GET.get('datum')
     if datum_str:
         try:
@@ -204,9 +224,10 @@ def prijava(request):
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             login(request, form.get_user())
-            # ce je prisel iz strani ki rabi prijavo ga vrnemo nazaj
+            # če je prišel s strani, ki zahteva prijavo, ga vrnemo nazaj
+            # (samo na naš strežnik, ne na kakšno tujo stran)
             naslednja = request.GET.get('next')
-            if naslednja:
+            if naslednja and url_has_allowed_host_and_scheme(naslednja, allowed_hosts={request.get_host()}):
                 return redirect(naslednja)
             return redirect('domov')
     else:

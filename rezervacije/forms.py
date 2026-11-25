@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 
 class RegistracijaForm(UserCreationForm):
-    email = forms.EmailField(required=True)
+    email = forms.EmailField(label='E-pošta', required=True)
     first_name = forms.CharField(label='Ime', max_length=50)
     last_name = forms.CharField(label='Priimek', max_length=50)
 

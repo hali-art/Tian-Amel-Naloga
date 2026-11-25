@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'rezervacije/style.css' %}">
-    <title>{% block naslov %}Frizerski salon{% endblock %}</title>
+    <title>{% block naslov %}Domov{% endblock %} | Frizerski salon</title>
 </head>
 <body>
     <nav>
@@ -17,7 +17,7 @@
             {% if user.frizer %}
                 <a href="{% url 'pregled_frizer' %}">Moji termini</a>
             {% endif %}
-            <span class="pozdrav">Pozdravljen, {{ user.username }}</span>
+            <span class="pozdrav">Pozdravljeni, {{ user.first_name|default:user.username }}</span>
             <form action="{% url 'odjava' %}" method="post" style="display:inline">
                 {% csrf_token %}
                 <button type="submit" class="gumb-odjava">Odjava</button>
@@ -39,7 +39,7 @@
     </main>
 
     <footer>
-        <p>Frizerski salon - rezervacija terminov</p>
+        <p>Frizerski salon – rezervacija terminov</p>
     </footer>
 </body>
 </html>
