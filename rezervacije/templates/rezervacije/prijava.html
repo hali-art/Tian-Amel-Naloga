@@ -3,11 +3,16 @@
 {% block naslov %}Prijava{% endblock %}
 
 {% block vsebina %}
-<h1>Prijava</h1>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Prijava</button>
-</form>
-<p>Še nimate računa? <a href="{% url 'registracija' %}">Registrirajte se</a></p>
+<div class="ozka">
+    <div class="kartica obrazec">
+        <h1>Prijava</h1>
+        <p class="podnaslov">Prijavite se za rezervacijo termina.</p>
+        <form method="post">
+            {% csrf_token %}
+            {% include 'rezervacije/_polja.html' %}
+            <button type="submit" class="gumb gumb-poln gumb-velik">Prijava</button>
+        </form>
+        <p class="pod-obrazcem">Še nimate računa? <a href="{% url 'registracija' %}">Registrirajte se</a></p>
+    </div>
+</div>
 {% endblock %}

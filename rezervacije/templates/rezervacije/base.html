@@ -4,42 +4,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'rezervacije/style.css' %}">
     <title>{% block naslov %}Domov{% endblock %} | Frizerski salon</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'rezervacije/style.css' %}">
 </head>
 <body>
-    <nav>
-        <a href="{% url 'domov' %}" class="logo">✂ Salon</a>
-        <a href="{% url 'domov' %}">Domov</a>
-        <a href="{% url 'storitve' %}">Storitve</a>
-        {% if user.is_authenticated %}
-            <a href="{% url 'moje_rezervacije' %}">Moje rezervacije</a>
-            {% if user.frizer %}
-                <a href="{% url 'pregled_frizer' %}">Moji termini</a>
-            {% endif %}
-            <span class="pozdrav">Pozdravljeni, {{ user.first_name|default:user.username }}</span>
-            <form action="{% url 'odjava' %}" method="post" style="display:inline">
-                {% csrf_token %}
-                <button type="submit" class="gumb-odjava">Odjava</button>
-            </form>
-        {% else %}
-            <a href="{% url 'prijava' %}">Prijava</a>
-            <a href="{% url 'registracija' %}">Registracija</a>
-        {% endif %}
-    </nav>
+    <header class="glava">
+        <div class="glava-vsebina">
+            <a href="{% url 'domov' %}" class="logo">
+                <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+                    <circle cx="6" cy="6" r="3" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="6" cy="18" r="3" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <path d="M8.1 8.1 20 20M8.1 15.9 20 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Salon
+            </a>
+
+            <input type="checkbox" id="meni-gumb" class="meni-gumb">
+            <label for="meni-gumb" class="meni-ikona" aria-label="Odpri meni"><span></span></label>
+
+            <nav class="meni">
+                <a href="{% url 'domov' %}" {% if request.resolver_match.url_name == 'domov' %}class="aktivno"{% endif %}>Domov</a>
+                <a href="{% url 'storitve' %}" {% if request.resolver_match.url_name == 'storitve' %}class="aktivno"{% endif %}>Storitve</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'moje_rezervacije' %}" {% if request.resolver_match.url_name == 'moje_rezervacije' %}class="aktivno"{% endif %}>Moje rezervacije</a>
+                    {% if user.frizer %}
+                        <a href="{% url 'pregled_frizer' %}" {% if request.resolver_match.url_name == 'pregled_frizer' %}class="aktivno"{% endif %}>Moji termini</a>
+                    {% endif %}
+                    <span class="pozdrav">{{ user.first_name|default:user.username }}</span>
+                    <form action="{% url 'odjava' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="gumb gumb-obroba gumb-mali">Odjava</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'prijava' %}" {% if request.resolver_match.url_name == 'prijava' %}class="aktivno"{% endif %}>Prijava</a>
+                    <a href="{% url 'registracija' %}" class="gumb gumb-mali">Registracija</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
 
     {% if messages %}
+    <div class="sporocila">
         {% for message in messages %}
             <div class="sporocilo {{ message.tags }}">{{ message }}</div>
         {% endfor %}
+    </div>
     {% endif %}
 
-    <main>
+    <main class="{% block main_razred %}vsebina{% endblock %}">
         {% block vsebina %}{% endblock %}
     </main>
 
-    <footer>
-        <p>Frizerski salon – rezervacija terminov</p>
+    <footer class="noga">
+        <div class="noga-vsebina">
+            <div>
+                <p class="noga-naslov">Frizerski salon</p>
+                <p>Rezervacija terminov preko spleta</p>
+            </div>
+            <div>
+                <p class="noga-naslov">Delovni čas</p>
+                <p>Ponedeljek – sobota: po urniku frizerjev<br>Nedelja: zaprto</p>
+            </div>
+        </div>
     </footer>
 </body>
 </html>
