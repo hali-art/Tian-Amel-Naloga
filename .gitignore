@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# virtualno okolje
+venv/
+.venv/
+env/
+
+# baza in lokalne datoteke
+db.sqlite3
+*.log
+.env
+
+# urejevalniki
+.vscode/
+.idea/
+.DS_Store
